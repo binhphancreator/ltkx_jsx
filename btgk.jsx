@@ -49,8 +49,11 @@ function createProject() {
   app.newProject()
 }
 
-function createNewComp(name, width, height, pixelAspect, duration, frameRate) {
+function createNewComp(name, width, height, pixelAspect, duration, frameRate, color) {
   var comp = app.project.items.addComp(name, width, height, pixelAspect, duration, frameRate)
+  if (!color)
+    color = [0, 0, 0]
+  comp.bgColor = color
   return comp
 }
 
@@ -66,8 +69,19 @@ window.mainPanel.buttons.btnCreateComp.onClick = function() {
   var pixelAspect = parseFloat(window.mainPanel.inputComp.pixelAspectCompEditText.text)
   var duration = 20
   var frameRate = parseInt(window.mainPanel.inputComp.frameRateCompEditText.text)
-  latestComp = createNewComp(name, width, height, pixelAspect, duration, frameRate)
+  var color = [28/255, 40/255, 51/255]
+  latestComp = createNewComp(name, width, height, pixelAspect, duration, frameRate, color)
+  latestComp.openInViewer()
 }
 window.mainPanel.buttons.btnCreateIntro.onClick = function() {
-
+  var text = window.mainPanel.inputProfile.editText.text
+  if (!latestComp)
+    alert('Bạn cần tạo composition trước khi thực hiện các bước tiếp theo!', 'Error')
+  var introTextLayer = latestComp.layers.addText(text)
+  introTextLayer.opacity.setValueAtTime(0, 0)
+  introTextLayer.opacity.setValueAtTime(2, 100)
+  introTextLayer.opacity.setValueAtTime(10, 0)
+  introTextLayer.opacity.setInterpolationTypeAtKey(1, KeyframeInterpolationType.HOLD)
+  introTextLayer.property("Source Text").fontSize  = 72
+  introTextLayer.property("Source Text").justification = ParagraphJustification.CENTER_JUSTIFY;
 }
