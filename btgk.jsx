@@ -141,7 +141,7 @@ window.mainPanel.shapes.btnCreateAnimation.onClick = function() {
     alert('Bạn cần tạo layer shape trước khi thực hiện tạo animation!', 'Error')
   createCarShape()
   var rectComp = [latestComp.width, latestComp.height]
-  latestShapelayer.property('Position').expression = "loopOut()"
+  //latestShapelayer.property('Position').expression = "loopOut()"
   latestShapelayer.property('Position').setValueAtTime(0, [-10, rectComp[1] / 2])
   latestShapelayer.property('Position').setValueAtTime(2, [rectComp[0] + 10, rectComp[1] / 2])
 }
