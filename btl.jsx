@@ -45,4 +45,16 @@ function createProject() {
   app.newProject()
 }
 
+function rendeProject() {
+  app.project.renderQueue.items.add(comp);
+  app.endUndoGroup();
+  app.endSuppressDialogs(false);
+  app.project.renderQueue.queueInAME(true);
+}
+
 var window = createUI()
+
+window.buttonPane.buttons.btnCreateProj.onClick = createProject
+window.buttonPane.buttons.btnHelp.onClick = function() {
+  alert("Hướng dẫn", "Hướng dẫn sử dụng");
+}
