@@ -6,23 +6,18 @@ var resourceUI = "window { properties:{ resizeable:false, maximizeButton: false 
       staticText: StaticText { text:'Nhập tên, mã sinh viên:' }, \
       editText: EditText { text:'Phan Văn Bình - B18DCPT031', characters:40 } \
     }, \
-    inputChannel: Group { \
-      staticText: StaticText { text:'Nhập tên kênh youtube:' }, \
-      editText: EditText { text:'PhanVanBinh', characters:40 } \
-    }, \
-    inputLogo: Group { \
-      staticText: StaticText { text:'Chưa chọn logo (sẽ lấy mặc định nếu bạn không chọn)' }, \
-      btnChooseLogo: Button { text:'Chọn logo'}, \
-    }, \
 	}, \
   buttonPane: Panel { orientation:'column', alignChildren:['left', 'top'],\
     text: 'Chức năng', \
     buttons: Group { \
-      alignment: ['center', 'top'] \
+      alignment: ['left', 'top'] \
+      btnCreateIntro: Button { text:'Tạo Intro Animation'}, \
+      btnCreateAnimation: Button { text:'Tạo Animation'}, \
+    }, \
+    buttonsCommon: Group { \
+      alignment: ['left', 'top'] \
       btnCreateProj: Button { text:'Tạo Project' }, \
       btnSaveProj: Button { text:'Lưu Project'}, \
-      btnCreateComp: Button { text:'Tạo Comp'}, \
-      btnCreateIntro: Button { text:'Tạo Animation'}, \
       btnRender: Button { text:'Render'}, \
       btnHelp: Button { text:'Hướng dẫn'}, \
     }, \
@@ -40,12 +35,31 @@ function saveFileWithDialog() {
   app.project.saveWithDialog()
 }
 
+function resolvePath(relative) {
+  var file = new File($.fileName)
+  var baseFolder = new Folder(file.parent.absoluteURI)
+  if (relative) 
+    return baseFolder.absoluteURI + "/" + relative
+  return baseFolder.absoluteURI
+}
+
 function createProject() {
   app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES)
   app.newProject()
+  createComps()
+  importFootage()
 }
 
-function rendeProject() {
+function createComps() {
+  mainComp = createNewComp("main")
+  introComp = createNewComp("intro")
+}
+
+function importFootage() {
+  bgFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/bg.png"))))
+}
+
+function renderProject(comp) {
   app.project.renderQueue.items.add(comp);
   app.endUndoGroup();
   app.endSuppressDialogs(false);
@@ -53,7 +67,7 @@ function rendeProject() {
 }
 
 function createNewComp(name, color) {
-  var comp = app.project.items.addComp(name, 1280, 720, 16/9, 20, 25)
+  var comp = app.project.items.addComp(name, 1280, 720, 1, 20, 30)
   if (!color)
     color = [0, 0, 0]
   comp.bgColor = color
@@ -62,35 +76,6 @@ function createNewComp(name, color) {
 
 function rgb(r, g ,b) {
   return [r / 255, g / 255, b / 255]
-}
-
-var window = createUI()
-var introComp = null
-var widthComp = 1280
-var heightComp = 720
-var keyframes = [0, 0.75, 1.25]
-var widthBorderIntroShape = 30
-var heightBorderIntroShape = 100
-var posXBorderIntroShape = -300
-var posYBorderIntroShape = 0
-var widthBgIntroShape = 30
-var heightBgIntroShape = 60
-var widthRootBgIntroShape = 630
-var leading = 20
-
-
-window.buttonPane.buttons.btnCreateProj.onClick = createProject
-window.buttonPane.buttons.btnHelp.onClick = function() {
-  alert("Hướng dẫn", "Hướng dẫn sử dụng");
-}
-
-window.buttonPane.buttons.btnCreateIntro.onClick = function() {
-  introComp = createNewComp("intro")
-  introComp.openInViewer()
-  var introShapeLayer = introComp.layers.addShape()
-  createBorderShape(introShapeLayer)
-  createRectBgIntroGroup(introShapeLayer, rgb(35, 113, 163))
-  addIntroTextLayer()
 }
 
 function addIntroTextLayer() {
@@ -133,7 +118,7 @@ function createTextLayer(comp, text, transform) {
   textDocument.applyFill = true
   textDocument.justification = ParagraphJustification.CENTER_JUSTIFY
   textDocument.tracking = -43
-  textDocument.horizontalScale = 1.6
+  // textDocument.horizontalScale = 1.6
 
   textLayer.sourceText.setValue(textDocument)
 
@@ -151,4 +136,52 @@ function createBorderShape(layer) {
   rectShape.property("ADBE Vector Rect Position").setValueAtTime(keyframes[2], [posXBorderIntroShape, posYBorderIntroShape])
 
   rectShapeGroup.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue([1, 1, 1])
+}
+
+function createIntro() {
+  introComp.openInViewer()
+  var introShapeLayer = introComp.layers.addShape()
+  createBorderShape(introShapeLayer)
+  createRectBgIntroGroup(introShapeLayer, rgb(35, 113, 163))
+  addIntroTextLayer()
+  createdIntro = true
+}
+
+var window = createUI()
+var introComp = null
+var mainComp = null
+
+var bgFootage = null
+
+var widthComp = 1280
+var heightComp = 720
+var keyframes = [0, 0.75, 1.25]
+var widthBorderIntroShape = 26
+var heightBorderIntroShape = 120
+var posXBorderIntroShape = -200
+var posYBorderIntroShape = 0
+var widthBgIntroShape = 30
+var heightBgIntroShape = 60
+var widthRootBgIntroShape = 430
+var leading = 20
+
+var createdIntro = false
+
+
+window.buttonPane.buttonsCommon.btnCreateProj.onClick = createProject
+window.buttonPane.buttonsCommon.btnRender.onClick = function() {
+  renderProject(mainComp)
+}
+window.buttonPane.buttonsCommon.btnHelp.onClick = function() {
+  alert("Hướng dẫn", "Hướng dẫn sử dụng");
+}
+
+window.buttonPane.buttons.btnCreateIntro.onClick = createIntro
+
+window.buttonPane.buttons.btnCreateAnimation.onClick = function() {
+  if (!createdIntro)
+    createIntro()
+  mainComp.openInViewer()
+  mainComp.layers.add(bgFootage)
+  mainComp.layers.add(introComp)
 }
