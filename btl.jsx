@@ -68,6 +68,16 @@ var window = createUI()
 var introComp = null
 var widthComp = 1280
 var heightComp = 720
+var keyframes = [0, 0.75, 1.25]
+var widthBorderIntroShape = 30
+var heightBorderIntroShape = 100
+var posXBorderIntroShape = -300
+var posYBorderIntroShape = 0
+var widthBgIntroShape = 30
+var heightBgIntroShape = 60
+var widthRootBgIntroShape = 630
+var leading = 20
+
 
 window.buttonPane.buttons.btnCreateProj.onClick = createProject
 window.buttonPane.buttons.btnHelp.onClick = function() {
@@ -78,28 +88,67 @@ window.buttonPane.buttons.btnCreateIntro.onClick = function() {
   introComp = createNewComp("intro")
   introComp.openInViewer()
   var introShapeLayer = introComp.layers.addShape()
+  createBorderShape(introShapeLayer)
+  createRectBgIntroGroup(introShapeLayer, rgb(35, 113, 163))
+  addIntroTextLayer()
+}
+
+function addIntroTextLayer() {
+  var text = window.inputPanel.inputProfile.editText.text
+  var introTextLayer = createTextLayer(introComp, text, [widthBorderIntroShape / 2, - (heightBorderIntroShape - heightBgIntroShape - leading) / 2])
+  createRectBgIntroGroup(introComp.layers.addShape(), rgb(255, 255, 255))
+  introTextLayer.trackMatteType = TrackMatteType.ALPHA
+}
+
+
+function createRectBgIntroGroup(layer, fill) {
+  var group = layer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
+  group.property("ADBE Vector Transform Group").opacity.setValue(80)
+
+  group.property("ADBE Vector Transform Group").position.setValueAtTime(keyframes[1], [0, (heightBgIntroShape - heightBorderIntroShape) / 2])
+  group.property("ADBE Vector Transform Group").position.setValueAtTime(keyframes[2], [posXBorderIntroShape + widthBorderIntroShape / 2, (heightBgIntroShape - heightBorderIntroShape) / 2])
+  group.property("ADBE Vector Transform Group").scale.setValueAtTime(keyframes[1], [0, (heightBorderIntroShape * 2 / 3) / heightBgIntroShape * 100])
+  group.property("ADBE Vector Transform Group").scale.setValueAtTime(keyframes[2], [widthRootBgIntroShape / widthBgIntroShape * 100, 100])
+
+  group.property("ADBE Vector Transform Group").property("Anchor Point").setValue([-widthBgIntroShape / 2, 0])
+  var maskRectIntroText = group.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
+  maskRectIntroText.property("ADBE Vector Rect Size").setValue([widthBgIntroShape, heightBgIntroShape])
+  group.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue(fill)
+
+  return group
+}
+
+
+function createTextLayer(comp, text, transform) {
+  var textLayer = comp.layers.addText(text)
   
-  var rectShapeGroup = introShapeLayer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
+  var textLayerPos = textLayer.position.value
+  textLayer.position.setValue([textLayerPos[0] + transform[0], textLayerPos[1] + transform[1]])
+
+  var textDocument = textLayer.sourceText.value
+  textDocument.resetCharStyle()
+  textDocument.font = "Arial"
+  textDocument.fontSize  = 28
+  textDocument.fillColor = [1, 1, 1]
+  textDocument.applyFill = true
+  textDocument.justification = ParagraphJustification.CENTER_JUSTIFY
+  textDocument.tracking = -43
+  textDocument.horizontalScale = 1.6
+
+  textLayer.sourceText.setValue(textDocument)
+
+  return textLayer
+}
+
+function createBorderShape(layer) {
+  var rectShapeGroup = layer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
 
   var rectShape = rectShapeGroup.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
-  rectShape.property("ADBE Vector Rect Size").setValueAtTime(0, [30, 0])
-  rectShape.property("ADBE Vector Rect Size").setValueAtTime(0.75, [30, 125])
-  rectShape.property("ADBE Vector Rect Size").setValueAtTime(1.25, [30, 100])
-  rectShape.property("ADBE Vector Rect Position").setValueAtTime(0.75, [0, 0])
-  rectShape.property("ADBE Vector Rect Position").setValueAtTime(1.25, [-400, 0])
+  rectShape.property("ADBE Vector Rect Size").setValueAtTime(keyframes[0], [widthBorderIntroShape, 0])
+  rectShape.property("ADBE Vector Rect Size").setValueAtTime(keyframes[1], [widthBorderIntroShape, heightBorderIntroShape + 25])
+  rectShape.property("ADBE Vector Rect Size").setValueAtTime(keyframes[2], [widthBorderIntroShape, heightBorderIntroShape])
+  rectShape.property("ADBE Vector Rect Position").setValueAtTime(keyframes[1], [0, 0])
+  rectShape.property("ADBE Vector Rect Position").setValueAtTime(keyframes[2], [posXBorderIntroShape, posYBorderIntroShape])
 
   rectShapeGroup.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue([1, 1, 1])
-
-  var bgIntroRectGroup = introShapeLayer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
-  bgIntroRectGroup.property("ADBE Vector Transform Group").opacity.setValue(80)
-  bgIntroRectGroup.property("ADBE Vector Transform Group").position.setValueAtTime(0.75, [0, -25])
-  bgIntroRectGroup.property("ADBE Vector Transform Group").position.setValueAtTime(1.25, [-385, -25])
-  bgIntroRectGroup.property("ADBE Vector Transform Group").property("Anchor Point").setValue([-25, 0])
-  bgIntroRectGroup.property("ADBE Vector Transform Group").scale.setValueAtTime(0.75, [0, 120])
-  bgIntroRectGroup.property("ADBE Vector Transform Group").scale.setValueAtTime(1.25, [1200, 100])
-
-  var bgIntroRect = bgIntroRectGroup.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
-  bgIntroRect.property("ADBE Vector Rect Size").setValue([50, 50])
-
-  bgIntroRectGroup.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue(rgb(35, 113, 163))
 }
