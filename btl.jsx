@@ -66,6 +66,9 @@ function createComps() {
 
 function importFootage() {
   bgFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/bg.png"))))
+  busFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/bus.png"))))
+  cloudFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/cloud.png"))))
+  schoolFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/school.png"))))
 }
 
 function renderProject(comp) {
@@ -193,10 +196,13 @@ var introComp = null
 var mainComp = null
 
 var bgFootage = null
+var busFootage = null
+var schoolFootage = null
+var cloudFootage = null
 
 var widthComp = 1280
 var heightComp = 720
-var keyframes = [0, 0.75, 1.25, 1.5]
+var keyframes = [0, 0.75, 1.25, 1.5, 2, 4]
 var widthBorderIntroShape = 20
 var heightBorderIntroShape = 120
 var posXBorderIntroShape = -200
@@ -235,7 +241,43 @@ window.buttonPane.buttons.btnCreateAnimation.onClick = function() {
   if (createdAnimation)
     return
   mainComp.openInViewer()
+
   mainComp.layers.add(bgFootage)
-  mainComp.layers.add(introComp)
+
+  var cloudLayer1 = mainComp.layers.add(cloudFootage)
+  cloudLayer1.scale.setValue([20, 20])
+  cloudLayer1.position.setValueAtTime(0, [1420, 20])
+  cloudLayer1.position.setValueAtTime(10, [-130, 20])
+  cloudLayer1.position.setValueAtTime(20, [1420, 20])
+
+  var cloudLayer2 = mainComp.layers.add(cloudFootage)
+  cloudLayer2.scale.setValue([20, 20])
+  cloudLayer2.position.setValueAtTime(2, [-130, 90])
+  cloudLayer2.position.setValueAtTime(11, [1420, 90])
+  cloudLayer2.position.setValueAtTime(20, [-130, 90])
+
+  var cloudLayer3 = mainComp.layers.add(cloudFootage)
+  cloudLayer3.scale.setValue([20, 20])
+  cloudLayer3.position.setValueAtTime(4, [-130, 60])
+  cloudLayer3.position.setValueAtTime(13, [1420, 60])
+  cloudLayer3.position.setValueAtTime(20, [-130, 60])
+
+  var schoolLayer = mainComp.layers.add(schoolFootage)
+  schoolLayer.scale.setValue([20, 20])
+  schoolLayer.position.setValue([789, 284])
+
+  var busLayer = mainComp.layers.add(busFootage)
+  busLayer.scale.setValue([20, 20])
+  busLayer.position.setValueAtTime(keyframes[5], [-350, 450])
+  busLayer.position.setValueAtTime(keyframes[5] + 7, [widthComp + 400, 450])
+  busLayer.position.setValueAtTime(keyframes[5] + 8, [-350, 450])
+  busLayer.position.setValueAtTime(keyframes[5] + 9, [-350, 450])
+  busLayer.position.setValueAtTime(keyframes[5] + 16, [widthComp + 400, 450])
+  busLayer.position.setInterpolationTypeAtKey(3, KeyframeInterpolationType.HOLD)
+
+  var introLayer = mainComp.layers.add(introComp)
+  introLayer.opacity.setValueAtTime(keyframes[4], 100)
+  introLayer.opacity.setValueAtTime(keyframes[5] + 1, 0)
+
   createdAnimation = true
 }
