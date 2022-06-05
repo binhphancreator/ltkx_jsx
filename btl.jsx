@@ -4,7 +4,11 @@ var resourceUI = "window { properties:{ resizeable:false, maximizeButton: false 
     text: 'Nhập thông tin', \
     inputProfile: Group { \
       staticText: StaticText { text:'Nhập tên, mã sinh viên:' }, \
-      editText: EditText { text:'Phan Văn Bình - B18DCPT031', characters:40 } \
+      editText: EditText { text:'Phan Văn Bình - B18DCPT031', characters:20 } \
+    }, \
+    inputComp: Group { \
+      staticText: StaticText { text:'Nhập tên comp:' }, \
+      editText: EditText { text:'main', characters:20 } \
     }, \
 	}, \
   buttonPane: Panel { orientation:'column', alignChildren:['left', 'top'],\
@@ -60,7 +64,8 @@ function saveFileWithDialog() {
 }
 
 function createComps() {
-  mainComp = createNewComp("main")
+  var nameMainComp = window.inputPanel.inputComp.editText.text
+  mainComp = createNewComp(nameMainComp)
   introComp = createNewComp("intro")
 }
 
@@ -226,7 +231,17 @@ window.buttonPane.buttonsCommon.btnRender.onClick = function() {
   renderProject(mainComp)
 }
 window.buttonPane.buttonsCommon.btnHelp.onClick = function() {
-  alert("Hướng dẫn", "Hướng dẫn sử dụng");
+  var helpText = " \
+    Hướng dẫn: \n \
+    - Để tạo mới Project: Click `Tạo Project` \
+    - Để tạo intro text animation khung cảnh trường học: Nhập tên và Click `Tạo Intro Animation` \
+    - Nhập tên comp cho animation comp. Tên mặc định sẽ là main \
+    - Để tạo animation khung cảnh trường học: Click `Tạo Animation` \
+    - Để lưu Project: Click `Lưu Project` \
+    - Để render ra file sản phẩm (yêu cầu đã cài Adobe Media Encoder): Click `Render` \n \
+    - Phan Văn Bình - B18DCPT031 - Extension tạo khung cảnh trường học - Bài tập lớn môn lập trình kỹ xảo \
+  "
+  alert(helpText, "Hướng dẫn sử dụng");
 }
 
 window.buttonPane.buttonsCommon.btnSaveProj.onClick = saveFileWithDialog
