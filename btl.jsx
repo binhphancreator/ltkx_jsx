@@ -48,6 +48,15 @@ function createProject() {
   app.newProject()
   createComps()
   importFootage()
+  createdProject = true
+  createdIntro = false
+  createdAnimation = false
+}
+
+function saveFileWithDialog() {
+  if (!createdProject)
+    createProject()
+  app.project.saveWithDialog()
 }
 
 function createComps() {
@@ -85,6 +94,13 @@ function addIntroTextLayer() {
   introTextLayer.trackMatteType = TrackMatteType.ALPHA
 }
 
+function addSubIntroTextLayer() {
+  var text = "Khung cảnh trường học"
+  var subIntroTextLayer = createTextLayer(introComp, text, [widthBorderIntroShape / 2, - (heightBgSubIntroShape - heightBorderIntroShape - leading) / 2])
+  createRectBgSubIntroGroup(introComp.layers.addShape(), rgb(255, 255, 255))
+  subIntroTextLayer.trackMatteType = TrackMatteType.ALPHA
+}
+
 
 function createRectBgIntroGroup(layer, fill) {
   var group = layer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
@@ -96,8 +112,25 @@ function createRectBgIntroGroup(layer, fill) {
   group.property("ADBE Vector Transform Group").scale.setValueAtTime(keyframes[2], [widthRootBgIntroShape / widthBgIntroShape * 100, 100])
 
   group.property("ADBE Vector Transform Group").property("Anchor Point").setValue([-widthBgIntroShape / 2, 0])
-  var maskRectIntroText = group.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
-  maskRectIntroText.property("ADBE Vector Rect Size").setValue([widthBgIntroShape, heightBgIntroShape])
+  var mask = group.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
+  mask.property("ADBE Vector Rect Size").setValue([widthBgIntroShape, heightBgIntroShape])
+  group.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue(fill)
+
+  return group
+}
+
+function createRectBgSubIntroGroup(layer, fill) {
+  var group = layer.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group")
+  group.property("ADBE Vector Transform Group").opacity.setValue(80)
+
+  group.property("ADBE Vector Transform Group").position.setValueAtTime(keyframes[2], [0, (-heightBgSubIntroShape + heightBorderIntroShape) / 2])
+  group.property("ADBE Vector Transform Group").position.setValueAtTime(keyframes[3], [posXBorderIntroShape + widthBorderIntroShape / 2, (-heightBgSubIntroShape + heightBorderIntroShape) / 2])
+  group.property("ADBE Vector Transform Group").scale.setValueAtTime(keyframes[2], [0, 100])
+  group.property("ADBE Vector Transform Group").scale.setValueAtTime(keyframes[3], [widthRootBgSubIntroShape / widthBgSubIntroShape * 100, 100])
+
+  group.property("ADBE Vector Transform Group").property("Anchor Point").setValue([-widthBgSubIntroShape / 2, 0])
+  var mask = group.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect")
+  mask.property("ADBE Vector Rect Size").setValue([widthBgSubIntroShape, heightBgSubIntroShape])
   group.property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill").property("ADBE Vector Fill Color").setValue(fill)
 
   return group
@@ -139,11 +172,19 @@ function createBorderShape(layer) {
 }
 
 function createIntro() {
+  if (!createdProject)
+    createProject()
+  if (createdIntro) 
+    return
   introComp.openInViewer()
   var introShapeLayer = introComp.layers.addShape()
   createBorderShape(introShapeLayer)
-  createRectBgIntroGroup(introShapeLayer, rgb(35, 113, 163))
+  createRectBgIntroGroup(introShapeLayer, rgb(35, 155, 86))
   addIntroTextLayer()
+
+  var subIntroShapeLayer = introComp.layers.addShape()
+  createRectBgSubIntroGroup(subIntroShapeLayer, rgb(86, 101, 115))
+  addSubIntroTextLayer()
   createdIntro = true
 }
 
@@ -155,33 +196,46 @@ var bgFootage = null
 
 var widthComp = 1280
 var heightComp = 720
-var keyframes = [0, 0.75, 1.25]
-var widthBorderIntroShape = 26
+var keyframes = [0, 0.75, 1.25, 1.5]
+var widthBorderIntroShape = 20
 var heightBorderIntroShape = 120
 var posXBorderIntroShape = -200
 var posYBorderIntroShape = 0
 var widthBgIntroShape = 30
-var heightBgIntroShape = 60
+var heightBgIntroShape = 70
 var widthRootBgIntroShape = 430
+var heightBgSubIntroShape =  heightBorderIntroShape - heightBgIntroShape
+var widthBgSubIntroShape =  30
+var widthRootBgSubIntroShape = 400
 var leading = 20
 
+var createdProject = false
 var createdIntro = false
-
+var createdAnimation = false
 
 window.buttonPane.buttonsCommon.btnCreateProj.onClick = createProject
 window.buttonPane.buttonsCommon.btnRender.onClick = function() {
+  if (!createdProject)
+    createProject()
   renderProject(mainComp)
 }
 window.buttonPane.buttonsCommon.btnHelp.onClick = function() {
   alert("Hướng dẫn", "Hướng dẫn sử dụng");
 }
 
+window.buttonPane.buttonsCommon.btnSaveProj.onClick = saveFileWithDialog
+
 window.buttonPane.buttons.btnCreateIntro.onClick = createIntro
 
 window.buttonPane.buttons.btnCreateAnimation.onClick = function() {
+  if (!createdProject)
+    createProject()
   if (!createdIntro)
     createIntro()
+  if (createdAnimation)
+    return
   mainComp.openInViewer()
   mainComp.layers.add(bgFootage)
   mainComp.layers.add(introComp)
+  createdAnimation = true
 }
