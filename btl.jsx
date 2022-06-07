@@ -70,10 +70,10 @@ function createComps() {
 }
 
 function importFootage() {
-  bgFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/bg.png"))))
-  busFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/bus.png"))))
-  cloudFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/cloud.png"))))
-  schoolFootage = app.project.importFile(new ImportOptions(new File(resolvePath("assets/school.png"))))
+  bgFootage = app.project.importFile(new ImportOptions(bgFile))
+  busFootage = app.project.importFile(new ImportOptions(busFile))
+  cloudFootage = app.project.importFile(new ImportOptions(cloudFile))
+  schoolFootage = app.project.importFile(new ImportOptions(schoolFile))
 }
 
 function renderProject(comp) {
@@ -223,6 +223,11 @@ var leading = 20
 var createdProject = false
 var createdIntro = false
 var createdAnimation = false
+
+var bgFile = new File("assets/bg.png")
+var busFile = new File("assets/bus.png")
+var cloudFile = new File("assets/cloud.png")
+var schoolFile = new File("assets/school.png")
 
 window.buttonPane.buttonsCommon.btnCreateProj.onClick = createProject
 window.buttonPane.buttonsCommon.btnRender.onClick = function() {
